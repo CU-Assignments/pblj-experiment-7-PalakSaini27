@@ -1,0 +1,59 @@
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class StudentController {
+    private Connection conn;
+
+    public StudentController() throws SQLException {
+        String url = "jdbc:mysql://localhost:3306/your_database";
+        String user = "Palak27";
+        String password = "12345";
+        conn = DriverManager.getConnection(url, user, password);
+    }
+
+    public void addStudent(Student student) throws SQLException {
+        String sql = "INSERT INTO Student VALUES (?, ?, ?, ?)";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, student.getStudentID());
+        stmt.setString(2, student.getName());
+        stmt.setString(3, student.getDepartment());
+        stmt.setDouble(4, student.getMarks());
+        stmt.executeUpdate();
+    }
+
+    public List<Student> getAllStudents() throws SQLException {
+        List<Student> list = new ArrayList<>();
+        String sql = "SELECT * FROM Student";
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(sql);
+
+        while (rs.next()) {
+            Student s = new Student(
+                rs.getInt("StudentID"),
+                rs.getString("Name"),
+                rs.getString("Department"),
+                rs.getDouble("Marks")
+            );
+            list.add(s);
+        }
+        return list;
+    }
+
+    public void updateStudent(Student student) throws SQLException {
+        String sql = "UPDATE Student SET Name=?, Department=?, Marks=? WHERE StudentID=?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setString(1, student.getName());
+        stmt.setString(2, student.getDepartment());
+        stmt.setDouble(3, student.getMarks());
+        stmt.setInt(4, student.getStudentID());
+        stmt.executeUpdate();
+    }
+
+    public void deleteStudent(int studentID) throws SQLException {
+        String sql = "DELETE FROM Student WHERE StudentID=?";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        stmt.setInt(1, studentID);
+        stmt.executeUpdate();
+    }
+}
